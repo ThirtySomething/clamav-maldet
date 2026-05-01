@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Maldet Quarantine</title>
+</head>
+
+<body>
+    <h1>Maldet Quarantine</h1>
+
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>ID</th>
+            <th>File</th>
+            <th>Action</th>
+        </tr>
+        {% for q in quarantine %}
+        <tr>
+            <td>{{ q.id }}</td>
+            <td>{{ q.file }}</td>
+            <td><a href="/restore/{{ q.id }}">Restore</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+</html>

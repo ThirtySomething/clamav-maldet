@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+venv/
+.env
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+
+# Editor backups and local settings
+*.swp
+*.swo
+*.tmp
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Docker/
+docker-compose.override.yml
+
+# System files
+Thumbs.db

@@ -1,0 +1,12 @@
+services:
+  clamav-maldet:
+    build: .
+    container_name: clamav-maldet
+    environment:
+      - SCAN_INTERVAL=24h
+      - SCAN_PATH=/scan
+    volumes:
+      - /path/to/your/data:/scan:ro
+      - /path/to/quarantine:/usr/local/maldetect/quarantine
+    ports:
+      - "8888:8888"
