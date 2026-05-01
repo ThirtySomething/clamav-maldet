@@ -1,6 +1,6 @@
 FROM alpine:3.20
 
-ENV SCAN_INTERVAL="24h"
+ENV SCAN_TIME="0 2 * * *"
 ENV SCAN_PATH="/scan"
 
 # Base packages + GNU tools + compatibility
@@ -21,7 +21,8 @@ RUN apk update && apk add --no-cache \
     tar \
     musl-fts \
     libc6-compat \
-    supervisor
+    supervisor \
+    dcron
 
 # Install Flask
 RUN pip install flask

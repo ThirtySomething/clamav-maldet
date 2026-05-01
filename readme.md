@@ -47,7 +47,7 @@ The provided `docker-compose.yml` exposes port `8888` and mounts the scan and qu
 Environment variables:
 
 - `SCAN_PATH` – path to scan inside the container (default: `/scan`)
-- `SCAN_INTERVAL` – scan interval used by `start.sh` (default: `24h`)
+- `SCAN_TIME` – cron schedule for scans (default: `0 2 * * *` for daily at 2 AM)
 
 ## Web UI
 
