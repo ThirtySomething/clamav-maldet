@@ -3,7 +3,8 @@ FROM alpine:3.20
 ENV SCAN_TIME="0 2 * * *"
 ENV SCAN_PATH="/scan"
 
-# Base packages + GNU tools + compatibility
+
+# Base packages + GNU tools + build tools + compatibility
 RUN apk update && apk add --no-cache \
     bash \
     curl \
@@ -21,11 +22,13 @@ RUN apk update && apk add --no-cache \
     tar \
     musl-fts \
     libc6-compat \
-    supervisor \
-    dcron
+    file \
+    perl \
+    dcron \
+    supervisor
 
-# Install Flask
-RUN pip install --break-system-packages flask
+# Install Flask (Alpine requires --break-system-packages)
+RUN pip3 install --break-system-packages flask
 
 # Update ClamAV signatures
 RUN freshclam
@@ -41,12 +44,14 @@ RUN mkdir -p /usr/local/src && \
 # Configure Maldet to use ClamAV
 RUN sed -i 's/clamav_scan="0"/clamav_scan="1"/' /usr/local/maldetect/conf.maldet
 
+# Copy scripts
 COPY scan.sh /usr/local/bin/scan.sh
 RUN chmod +x /usr/local/bin/scan.sh
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Copy WebUI
 COPY webui /opt/webui
 
 EXPOSE 8888
