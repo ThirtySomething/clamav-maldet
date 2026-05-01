@@ -25,13 +25,14 @@ RUN apk update && apk add --no-cache \
     dcron
 
 # Install Flask
-RUN pip install flask
+RUN pip install --break-system-packages flask
 
 # Update ClamAV signatures
 RUN freshclam
 
 # Install Maldet
-RUN cd /usr/local/src && \
+RUN mkdir -p /usr/local/src && \
+    cd /usr/local/src && \
     wget https://www.rfxn.com/downloads/maldetect-current.tar.gz && \
     tar -xzf maldetect-current.tar.gz && \
     cd maldetect-* && \
