@@ -1,6 +1,7 @@
 FROM alpine:3.20
 
 ENV SCAN_TIME="0 2 * * *"
+ENV UPDATE_TIME="0 1 * * *"
 ENV SCAN_PATH="/scan"
 ENV SCAN_MAX_FILESIZE=""
 

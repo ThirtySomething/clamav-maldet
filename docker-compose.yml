@@ -4,6 +4,7 @@ services:
     container_name: clamav-maldet
     environment:
       - SCAN_TIME=0 2 * * *
+      - UPDATE_TIME=0 1 * * *
       - SCAN_PATH=/scan
       - SCAN_MAX_FILESIZE=500m
     volumes:
