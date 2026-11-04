@@ -28,6 +28,7 @@ docker build -t clamav-maldet:latest .
 ```bash
 docker run --rm -p 8888:8888 \
   -e SCAN_PATH=/scan \
+  -e SCAN_MAX_FILESIZE=500m \
   -e SCAN_INTERVAL=24h \
   -v /path/to/data:/scan:ro \
   -v /path/to/quarantine:/usr/local/maldetect/quarantine \
@@ -48,10 +49,11 @@ Environment variables:
 
 - `SCAN_PATH` – path to scan inside the container (default: `/scan`)
 - `SCAN_TIME` – cron schedule for scans (default: `0 2 * * *` for daily at 2 AM)
+- `SCAN_MAX_FILESIZE` – maximum file size using [Compose byte-value syntax][compose-byte-values]: plain bytes or case-insensitive `b`, `k`/`kb`, `m`/`mb`, `g`/`gb` suffixes. Examples: `500b`, `1024kb`, `20m`, `1gb`, `1.5gb`. Units use powers of 1024; fractional bytes are rounded down. The value is converted to bytes before invoking Maldet and passed to ClamAV as `--max-filesize=<VALUE>`. The converted size must be at least 1 byte and below 4 GiB. Compose sets `500m` (500 MiB); unset or empty keeps Maldet's automatic limit. Maldet's file selection limit is adjusted to include files up to this size, and ClamAV's total scan-size limit is set to twice this value.
 
 ## Web UI
 
-Open `http://localhost:8888` in your browser to view quarantined files and restore them.
+Open the [Web UI][web-ui] in your browser to view quarantined files and restore them.
 
 ## Notes
 
@@ -60,10 +62,17 @@ Open `http://localhost:8888` in your browser to view quarantined files and resto
 
 ## Links
 
-- ClamAV: https://www.clamav.net/
-- Linux Malware Detect: https://www.rfxn.com/projects/linux-malware-detect/
-- Docker: https://www.docker.com/
+- [ClamAV][clamav]
+- [Linux Malware Detect][maldet]
+- [Docker][docker]
 
 ## License
 
-This project is licensed under the terms in [LICENSE](LICENSE).
+This project is licensed under the terms in [LICENSE][license].
+
+[clamav]: https://www.clamav.net/
+[compose-byte-values]: https://docs.docker.com/reference/compose-file/extension/#specifying-byte-values
+[docker]: https://www.docker.com/
+[license]: LICENSE
+[maldet]: https://www.rfxn.com/projects/linux-malware-detect/
+[web-ui]: http://localhost:8888

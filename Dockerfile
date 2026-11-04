@@ -2,6 +2,7 @@ FROM alpine:3.20
 
 ENV SCAN_TIME="0 2 * * *"
 ENV SCAN_PATH="/scan"
+ENV SCAN_MAX_FILESIZE=""
 
 
 # Base packages + GNU tools + build tools + compatibility
@@ -43,6 +44,15 @@ RUN mkdir -p /usr/local/src && \
 
 # Configure Maldet to use ClamAV
 RUN sed -i 's/clamav_scan="0"/clamav_scan="1"/' /usr/local/maldetect/conf.maldet
+
+# Override Maldet's signature-derived limits when a file-size limit is supplied.
+RUN grep -Fq '        if [ "$scan_clamscan" == "1" ]; then' /usr/local/maldetect/internals/functions && \
+    sed -i '/^        if \[ "$scan_clamscan" == "1" \]; then/i\
+        if [ -n "$SCAN_MAX_FILESIZE" ]; then\
+                clamscan_max_filesize="$SCAN_MAX_FILESIZE"\
+                scan_max_filesize="$((SCAN_MAX_FILESIZE + 1))c"\
+        fi\
+' /usr/local/maldetect/internals/functions
 
 # Copy scripts
 COPY scan.sh /usr/local/bin/scan.sh
