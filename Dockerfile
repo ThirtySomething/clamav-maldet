@@ -1,5 +1,6 @@
 FROM alpine:3.20
 
+ENV TZ="Europe/Berlin"
 ENV SCAN_TIME="0 2 * * *"
 ENV UPDATE_TIME="0 1 * * *"
 ENV SCAN_PATH="/scan"
@@ -9,6 +10,7 @@ ENV SCAN_MAX_FILESIZE=""
 # Base packages + GNU tools + build tools + compatibility
 RUN apk update && apk add --no-cache \
     bash \
+    tzdata \
     curl \
     wget \
     python3 \

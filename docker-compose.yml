@@ -3,10 +3,11 @@ services:
     build: .
     container_name: clamav-maldet
     environment:
-      - SCAN_TIME=0 2 * * *
-      - UPDATE_TIME=0 1 * * *
-      - SCAN_PATH=/scan
       - SCAN_MAX_FILESIZE=500m
+      - SCAN_PATH=/scan
+      - SCAN_TIME=0 2 * * *
+      - TZ=Europe/Berlin
+      - UPDATE_TIME=0 1 * * *
     volumes:
       - /path/to/your/data:/scan:ro
       - /path/to/quarantine:/usr/local/maldetect/quarantine
