@@ -18,9 +18,25 @@ ClamAV can detect and quarantine infected files, but it does not restore them to
 
 ## Build
 
+Build the image directly with Docker, tagging it with the build date (`YYYYMMDD`)
+and `latest`, then push both tags to the registry configured in `.env`:
+
 ```bash
-docker build -t clamav-maldet:latest .
+REGISTRY=MY-REGISTRY:MY-REGISTRY-PORT
+IMAGE="$REGISTRY/thirtysomething/clamav-maldet"
+BUILD_DATE="$(date +%Y%m%d)"
+
+docker login "$REGISTRY"
+docker build \
+  -t "$IMAGE:$BUILD_DATE" \
+  -t "$IMAGE:latest" \
+  .
+docker push "$IMAGE:$BUILD_DATE"
+docker push "$IMAGE:latest"
 ```
+
+Set `REGISTRY` to the same registry host and port in `.env`. Compose runs the
+`latest` tag from that registry.
 
 ## Run
 
@@ -31,23 +47,45 @@ docker run --rm -p 8888:8888 \
   -e SCAN_PATH=/scan \
   -e SCAN_MAX_FILESIZE=500m \
   -e SCAN_INTERVAL=24h \
-  -v /path/to/data:/scan:ro \
+  -v /path/to/data:/scan \
   -v /path/to/quarantine:/usr/local/maldetect/quarantine \
-  clamav-maldet:latest
+  MY-REGISTRY:MY-REGISTRY-PORT/thirtysomething/clamav-maldet:latest
 ```
 
 ### Using Docker Compose
+
+Edit the provided `.env` file to set the scan and quarantine directories on the
+host, the host port for the Web UI, the registry, and the container environment
+settings. Push the image before starting the service:
 
 ```bash
 docker compose up -d
 ```
 
-The provided `docker-compose.yml` exposes port `8888` and mounts the scan and quarantine volumes.
+`SCAN_HOST_PATH` and `QUARANTINE_HOST_PATH` are host paths. `HOST_PORT` is the
+host port mapped to the Web UI's container port `8888`. Scan directories are
+mounted read-write so Maldet can move infected files to quarantine.
+
+To scan multiple host directories, replace the single scan volume entry in
+`docker-compose.yml` with one entry per directory, mounting each at a different
+subdirectory under `/scan`:
+
+```yaml
+volumes:
+  - /path/to/data1:/scan/data1
+  - /path/to/data2:/scan/data2
+  - ${QUARANTINE_HOST_PATH}:/usr/local/maldetect/quarantine
+```
+
+Keep `SCAN_PATH=/scan`; Maldet scans the contents of both mounted directories.
+Do not mount both host paths to the exact same container path (`/scan`), since
+one mount will hide the other.
 
 ## Configuration
 
 Environment variables:
 
+- `REGISTRY` – registry host and optional port used to pull the Compose image (for example, `MY-REGISTRY:MY-REGISTRY-PORT`)
 - `SCAN_MAX_FILESIZE` – maximum file size using [Compose byte-value syntax][compose-byte-values]: plain bytes or case-insensitive `b`, `k`/`kb`, `m`/`mb`, `g`/`gb` suffixes. Examples: `500b`, `1024kb`, `20m`, `1gb`, `1.5gb`. Units use powers of 1024; fractional bytes are rounded down. The value is converted to bytes before invoking Maldet and passed to ClamAV as `--max-filesize=<VALUE>`. The converted size must be at least 1 byte and below 4 GiB. Compose sets `500m` (500 MiB); unset or empty keeps Maldet's automatic limit. Maldet's file selection limit is adjusted to include files up to this size, and ClamAV's total scan-size limit is set to twice this value.
 - `SCAN_PATH` – path to scan inside the container (default: `/scan`)
 - `SCAN_TIME` – cron schedule for scans (default: `0 2 * * *` for daily at 2 AM)

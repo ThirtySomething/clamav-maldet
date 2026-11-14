@@ -1,15 +1,15 @@
 services:
   clamav-maldet:
-    build: .
+    image: ${REGISTRY}/thirtysomething/clamav-maldet:latest
     container_name: clamav-maldet
     environment:
-      - SCAN_MAX_FILESIZE=500m
-      - SCAN_PATH=/scan
-      - SCAN_TIME=0 2 * * *
-      - TZ=Europe/Berlin
-      - UPDATE_TIME=0 1 * * *
+      SCAN_MAX_FILESIZE: ${SCAN_MAX_FILESIZE}
+      SCAN_PATH: ${SCAN_PATH}
+      SCAN_TIME: ${SCAN_TIME}
+      TZ: ${TZ}
+      UPDATE_TIME: ${UPDATE_TIME}
     volumes:
-      - /path/to/your/data:/scan:ro
-      - /path/to/quarantine:/usr/local/maldetect/quarantine
+      - ${SCAN_HOST_PATH}:/scan
+      - ${QUARANTINE_HOST_PATH}:/usr/local/maldetect/quarantine
     ports:
-      - "8888:8888"
+      - "${HOST_PORT}:8888"
